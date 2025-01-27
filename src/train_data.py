@@ -4,6 +4,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 import pandas as pd
 import numpy as np
+import joblib
+import pickle
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -35,12 +37,7 @@ def knn_train(file_path, n_neighbors):
     ### Evaluating the model
     y_pred = knn_model.predict(X_test)
     
-    knn_accuracy = accuracy_score(y_test, y_pred)
-    print(f"Accuracy: {knn_accuracy:.2f}")
-    
     knn_report = classification_report(y_test, y_pred, target_names=['No Depression', 'Depression'])
-    print("\nClassification Report:")
-    print(knn_report)
     
     return knn_model, knn_report
 
@@ -62,13 +59,8 @@ def random_forest_train(file_path):
     
     ### Evaluating the model
     rf_predictions = rf_model.predict(X_test)
-    
-    rf_accuracy = accuracy_score(y_test, rf_predictions)
-    print(f"Accuracy: {rf_accuracy:.2f}")
   
     rf_classification_report = classification_report(y_test, rf_predictions, target_names=['No Depression', 'Depression'])
-    print("\nClassification Report:")  
-    print(rf_classification_report)
     
     return rf_model, rf_classification_report
 
@@ -82,6 +74,8 @@ def cnn_train(file_path):
     
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
+        
+    joblib.dump(scaler, '../scaler.pkl')
     
     y_categorical = to_categorical(y)
 
@@ -99,24 +93,21 @@ def cnn_train(file_path):
     cnn_model.compile(optimizer=Adam(learning_rate=0.002), loss='categorical_crossentropy', metrics=['accuracy'])
 
     ### Training a KNN classifier
-    cnn_model.fit(X_train, y_train, epochs=100, batch_size=16, validation_split=0.2, verbose=1)
+    cnn_model.fit(X_train, y_train, epochs=100, batch_size=12, validation_split=0.2, verbose=1)
 
     ### Evaluating the model
     cnn_predictions = cnn_model.predict(X_test)
     
     cnn_predicted_classes = np.argmax(cnn_predictions, axis=1)
     y_test_classes = np.argmax(y_test, axis=1)
-    
-    print("\nClassification Report:")
   
     cnn_report = classification_report(y_test_classes, cnn_predicted_classes, target_names=['No Depression', 'Depression'])
-    print(cnn_report)
     
     return cnn_model, cnn_report
 
 if __name__ == "__main__":
     
-    knn_model, knn_report = knn_train(NORNALIZED_DATASET_PATH, 2)
+    knn_model, knn_report = knn_train(NORNALIZED_DATASET_PATH, 11)
     
     rf_model, rf_report = random_forest_train(NORNALIZED_DATASET_PATH)
     
@@ -124,8 +115,15 @@ if __name__ == "__main__":
     
     print("-----------------------------------------------------")
     print("\nComparison of Models:\n")
+    print("-----------------------------------------------------")
     print("KNN:\n", knn_report)
+    print("-----------------------------------------------------")
     print("\nRandom Forest:\n", rf_report)
+    print("-----------------------------------------------------")
     print("\nConvolutional Neural Network:\n", cnn_report)
     
     cnn_model.save("../best_model.keras")
+    
+    joblib.dump(knn_model, "../knn_model.keras")
+    
+    joblib.dump(rf_model, "../rf_model.keras")

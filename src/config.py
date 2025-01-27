@@ -3,3 +3,4 @@ DATASET2_PATH = "../MentalHealthSurvey.csv"
 
 CLEANSED_DATASET_PATH = "../CleansedDataset.csv"
 NORNALIZED_DATASET_PATH = "../NormalizedDataset.csv"
+BEST_MODEL_PATH = "../best_model.keras"
