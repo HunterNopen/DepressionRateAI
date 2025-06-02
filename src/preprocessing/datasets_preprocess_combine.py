@@ -2,7 +2,7 @@
 import pandas as pd
 
 from config import DATASET1_PATH, DATASET2_PATH
-from helpers import  to_snake_case, sleep_col_mediate, study_hours_col_mediate, depression_col_mediate, sleep_col_mediate_to_int, study_hours_col_mediate_to_int
+from utils.helpers import  to_snake_case, sleep_col_mediate, study_hours_col_mediate, depression_col_mediate, sleep_col_mediate_to_int, study_hours_col_mediate_to_int
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import LabelEncoder
 
